@@ -102,7 +102,7 @@ RewriteRule ^(.+)$ index.php [L]
     $directly->publicDir = 'assets';
 
 
-## Shorttags
+## Short tags
 
     [inc:menu.html] =   inclui no documento o conteúdo do arquivo menu.html localizado no diretório /app/inc
 
