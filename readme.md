@@ -97,7 +97,7 @@ RewriteRule ^(.+)$ index.php [L]
 
 
 
-## Detail
+## Other options
 
     $directly->publicDir = 'assets';
 
