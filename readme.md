@@ -27,6 +27,18 @@ $directly = new Directly('app');
 $directly->run('/');
 ```
 
+    
+Create an .htaccess file with the following contents:
+
+```
+<IfModule mod_rewrite.c>
+RewriteEngine on
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f                     
+RewriteRule ^(.+)$ index.php [L]                
+</IfModule>
+```
+
 
 ## Class Directly()
 
@@ -81,6 +93,8 @@ $directly->run('/');
         |--- index.php
 
 ```
+
+
 
 
 ## Detail
