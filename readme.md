@@ -104,7 +104,7 @@ RewriteRule ^(.+)$ index.php [L]
 
 ## Short tags
 
-    [inc:menu.html] =   inclui no documento o conteúdo do arquivo menu.html localizado no diretório /app/inc
+    [inc:menu.html] =   includes no document the contents of the menu.html file located in the directory /app/inc
 
 ## License
 
