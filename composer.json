@@ -1,0 +1,20 @@
+{
+    "name": "wallrio/directly",
+    "type": "library",
+    "description": "micro-framework to provider web pages quickly",
+    "keywords": ["web","pages","quickly","micro-framework","view"],
+    "homepage": "http://wallrio.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Wallace Rio",
+            "email": "wallrio@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.2",        
+    },    
+    "autoload": {
+         "psr-4": {"directly\\": "src"}
+    }   
+}
