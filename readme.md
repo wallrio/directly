@@ -28,6 +28,67 @@ $directly->run('/');
 ```
 
 
+## Class Directly()
+
+- new Directly(DIRECTORY-YOUR-APP);
+
+        DIRECTORY-YOUR-APP  =  specifies the application directory (optional)
+
+- $directly->run(ROUTE);
+
+        ROUTE   =   specifies an initial route (optional)
+
+
+- Optionally you can force a home directory for your files, use the attribute below for this:
+
+    $directly->publicDir = 'DIRECTORY-PUBLIC';
+
+        DIRECTORY-PUBLIC    =   specify a directory after the directory of your application
+    
+    ### example
+    ```
+    $directly->publicDir = 'assets';
+    ```
+
+            
+## Struct directory
+
+```
+    /your-directory-project
+        |
+        |--app/
+        |   |
+        |   |--error
+        |   |    |--404
+        |   |        |--view.html
+        |   |
+        |   |--global
+        |   |    |--header.html
+        |   |    |--footer.html
+        |   |    
+        |   |--inc
+        |   |    |--menu.html
+        |   |
+        |   |--view
+        |       |--home
+        |          |--view.html
+        |       |--about
+        |          |--view.html
+        |       |--contact
+        |          |--view.html
+        |
+        |--- .htaccess
+        |--- index.php
+
+```
+
+
+## Detail
+
+    $directly->publicDir = 'assets';
+
+
+
 ## License
 
 The Directly Framework is licensed under the MIT license. See [License File](LICENSE) for more information.
