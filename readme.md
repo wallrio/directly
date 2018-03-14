@@ -1,6 +1,6 @@
 # Directly
 
-Micro-framework to provider web pages quickly
+Micro-framework PHP to provider web pages quickly
 
 ### Example
 
