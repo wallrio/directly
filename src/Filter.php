@@ -11,9 +11,7 @@ class Filter{
 
 		self::$dir = $dir;
 		self::$domain = $domain;
-		
-		
-		// preg_replace(pattern, replacement, subject)
+			
 		$content = preg_replace_callback("#\[(.*):(.*)]#i", function($value){
 			$source = isset($value[0])?$value[0]:null;
 			$key = isset($value[1])?$value[1]:null;
@@ -27,19 +25,14 @@ class Filter{
 				if(file_exists($filename)){
 					$content = file_get_contents($filename);
 					return $content;
+				}else{				
+					$content = '';
+					return $content;
 				}
 				return $source;
 			}
 
-			if($key == 'url'){
-				
-				/*$page_app =self::$dir.'inc'.DIRECTORY_SEPARATOR;	
-				$filename = $page_app.$value;
-				$filename = str_replace('//', '/', $filename);
-				if(file_exists($filename)){
-					$content = file_get_contents($filename);
-					return $content;
-				}*/
+			if($key == 'url'){							
 				return self::$domain;
 			}
 
@@ -48,11 +41,7 @@ class Filter{
 
 		preg_match_all("#\[(.*):(.*)]#i", $content, $matches);
 
-		if(count($matches[0]) > 0){
-			
-			// print_r( $matches );
-			
-
+		if(count($matches[0]) > 0){		
 			$content = self::includes($content,$dir,self::$domain);
 		}
 
