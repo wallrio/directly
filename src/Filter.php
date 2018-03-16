@@ -5,10 +5,12 @@ namespace directly;
 class Filter{
 
 	private static $dir;
+	private static $domain;
 
-	public static function includes($content,$dir){
+	public static function includes($content,$dir,$domain){
 
 		self::$dir = $dir;
+		self::$domain = $domain;
 		
 		
 		// preg_replace(pattern, replacement, subject)
@@ -28,8 +30,31 @@ class Filter{
 				}
 				return $source;
 			}
+
+			if($key == 'url'){
+				
+				/*$page_app =self::$dir.'inc'.DIRECTORY_SEPARATOR;	
+				$filename = $page_app.$value;
+				$filename = str_replace('//', '/', $filename);
+				if(file_exists($filename)){
+					$content = file_get_contents($filename);
+					return $content;
+				}*/
+				return self::$domain;
+			}
+
 			return $source;
 		}, $content);
+
+		preg_match_all("#\[(.*):(.*)]#i", $content, $matches);
+
+		if(count($matches[0]) > 0){
+			
+			// print_r( $matches );
+			
+
+			$content = self::includes($content,$dir,self::$domain);
+		}
 
 		return $content;
 	}

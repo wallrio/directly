@@ -24,10 +24,14 @@ class Directly{
 	public function run($urlRoute = '/'){
 		
 		// get request data
+		$REQUEST_SCHEME = $_SERVER['REQUEST_SCHEME'];	
+		$HTTP_HOST = $_SERVER['HTTP_HOST'];	
 		$SCRIPT_NAME = $_SERVER['SCRIPT_NAME'];	
 		$SERVER_PROTOCOL = isset($SERVER_PROTOCOL['REDIRECT_URL'])?($SERVER_PROTOCOL['REDIRECT_URL']):null;
 		$PHP_SELF = isset($PHP_SELF['REDIRECT_URL'])?($PHP_SELF['REDIRECT_URL']):null;
 		$REDIRECT_URL = isset($_SERVER['REDIRECT_URL'])?($_SERVER['REDIRECT_URL']):null;
+
+		
 
 		// set initial variables 
 		$localdir = dirname($SCRIPT_NAME);
@@ -35,6 +39,10 @@ class Directly{
 		$extension = false;
 		$publicDirReal = '';
 
+		$this->domain = $REQUEST_SCHEME . '://' . str_replace('//', '/', $HTTP_HOST.'/'.$localdir).'/';
+
+		
+	
 		if(count($extensionArray)>1)			
 			$extension = end($extensionArray);
 		
@@ -99,6 +107,7 @@ class Directly{
 		$pageNewArray = array_filter($pageNewArray);
 		$pageArray = array_values($pageNewArray);			
 		$page = implode('/', $pageNewArray);
+
 
 		// set paths
 		$global_dir = $this->dir.'global'.DIRECTORY_SEPARATOR;
@@ -199,7 +208,7 @@ class Directly{
 
 
 		// filter with shorttag
-		$content = Filter::includes($content,$this->dir);
+		$content = Filter::includes($content,$this->dir,$this->domain);
 		
 		// show de content
 		$this->show($content);
