@@ -72,22 +72,22 @@ RewriteRule ^(.+)$ index.php [L]
         |   |
         |   |--error
         |   |    |--404
-        |   |        |--view.html
+        |   |        |--view.php
         |   |
         |   |--global
-        |   |    |--header.html
-        |   |    |--footer.html
+        |   |    |--header.php
+        |   |    |--footer.php
         |   |    
         |   |--inc
-        |   |    |--menu.html
+        |   |    |--menu.php
         |   |
         |   |--view
         |       |--home
-        |          |--view.html
+        |          |--view.php
         |       |--about
-        |          |--view.html
+        |          |--view.php
         |       |--contact
-        |          |--view.html
+        |          |--view.php
         |
         |--- .htaccess
         |--- index.php
@@ -104,7 +104,7 @@ RewriteRule ^(.+)$ index.php [L]
 
 ## Short tags
 
-    [inc:menu.html] =   includes no document the contents of the menu.html file located in the directory /app/inc
+    [inc:menu.php] =   includes no document the contents of the menu.php file located in the directory /app/inc
 
 ## License
 
