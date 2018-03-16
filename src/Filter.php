@@ -22,8 +22,12 @@ class Filter{
 				$page_app =self::$dir.'inc'.DIRECTORY_SEPARATOR;	
 				$filename = $page_app.$value;
 				$filename = str_replace('//', '/', $filename);
-				if(file_exists($filename)){
-					$content = file_get_contents($filename);
+				if(file_exists($filename)){				
+					ob_start();
+					include $filename;
+					$content = ob_get_contents();
+					ob_end_clean();
+
 					return $content;
 				}else{				
 					$content = '';

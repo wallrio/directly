@@ -194,15 +194,15 @@ class Directly{
 		// get content of buffer
 		
 		ob_start();
-		include_once $global_dir.'header.html';
-		if(file_exists($page_dir.'view.html') && $routeStatus == true){
+		include_once $global_dir.'header.php';
+		if(file_exists($page_dir.'view.php') && $routeStatus == true){
 
-			include_once $page_dir.'view.html';		
+			include_once $page_dir.'view.php';		
 		}else{
 			header("HTTP/1.0 404 Not Found [".$page."]");
-		    include_once $page_error404.'view.html';				   
+		    include_once $page_error404.'view.php';				   
 		}
-		include_once $global_dir.'footer.html';
+		include_once $global_dir.'footer.php';
 		$content = ob_get_contents();
 		ob_end_clean();
 
