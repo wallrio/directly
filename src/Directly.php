@@ -169,13 +169,8 @@ class Directly{
 
 
 			if(file_exists($filename)){		
-				$typeFile = FileHandle::getType($filename);
-				// echo $typeFile.'--'.$filename;
-				// exit;
-
-				
-				header('Content-Type: '.$typeFile.'; charset=UTF-8');
-				
+				$typeFile = FileHandle::getType($filename);					
+				header('Content-Type: '.$typeFile.'; charset=UTF-8');				
 				if($typeFile == 'text/php'){
 					include $filename;
 				}else{
@@ -208,7 +203,7 @@ class Directly{
 
 
 		// filter with shorttag
-		$content = Filter::includes($content,$this->dir,$this->domain);
+		$content = Filter::includes($content,$this->dir,$this->domain,$page);
 		
 		// show de content
 		$this->show($content);

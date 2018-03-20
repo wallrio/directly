@@ -106,6 +106,8 @@ RewriteRule ^(.+)$ index.php [L]
 
     [inc:menu.php] =   includes no document the contents of the menu.php file located in the directory /app/inc
 
+    [inc-route:meta.php] = includes no document the contents of the menu.php file located in the directory /app/view/[CURRENT-PAGE]/meta.php
+
 ## License
 
 The Directly Framework is licensed under the MIT license. See [License File](LICENSE) for more information.
