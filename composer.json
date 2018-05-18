@@ -1,6 +1,7 @@
 {
     "name": "wallrio/directly",
     "type": "library",
+    "version":"0.0.2",
     "description": "micro-framework to provider web pages quickly",
     "keywords": ["web","pages","quickly","micro-framework","view"],
     "homepage": "http://wallrio.com",

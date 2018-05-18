@@ -10,18 +10,57 @@ class Directly{
 	private $dir;
 	public $publicDir = '';
 
-	function __construct($appDir = 'app'){
+	function __construct($appDir = 'app',$publicDir = null){
 		$this->dir = $appDir.DIRECTORY_SEPARATOR;
 		if(!file_exists($this->dir)){
 			echo 'Not exist application [ '.$this->dir.' ]';
 			exit;	
 		}
+
+		$this->publicDir = $publicDir;
+
+		$this->changeHeader($appDir.'/'.$this->publicDir);
 		
 	}
 
+	public function getExtension($filename){
+		if(strpos($filename, '.')!== -1){
+			return 'html';
+		}
+
+		 $file_ext = explode('.',$filename);
+		 $file_ext = array_filter($file_ext);
+		 return end($file_ext);
+		
+	}
+
+	public function changeHeader($publicDir = ''){
+
+		$REDIRECT_URL = isset($_SERVER['REDIRECT_URL'])?$_SERVER['REDIRECT_URL']:null;
+		$REQUEST_URI = isset($_SERVER['REQUEST_URI'])?$_SERVER['REQUEST_URI']:null;
+		$SCRIPT_NAME = isset($_SERVER['SCRIPT_NAME'])?$_SERVER['SCRIPT_NAME']:null;
+
+		$dirName = dirname($SCRIPT_NAME);
+		$fileName = basename($SCRIPT_NAME);
+		$filePath = str_replace($dirName, '', $REQUEST_URI);
+		
+
+		$REQUEST_URI_NEW = $dirName.'/'.$publicDir.$filePath;
+		$SCRIPT_NAME_NEW = $dirName.'/'.$publicDir.'/'.$fileName;
+
 	
+		$_SERVER['REDIRECT_URL'] = $REQUEST_URI_NEW;
+		$_SERVER['REQUEST_URI'] = $REQUEST_URI_NEW;			
+		$_SERVER['SCRIPT_NAME'] = $SCRIPT_NAME_NEW;			
+		
+
+
+
+	}
 
 	public function run($urlRoute = '/'){
+
+
 		
 		// get request data
 		$REQUEST_SCHEME = $_SERVER['REQUEST_SCHEME'];	
@@ -32,10 +71,13 @@ class Directly{
 		$REDIRECT_URL = isset($_SERVER['REDIRECT_URL'])?($_SERVER['REDIRECT_URL']):null;
 
 		
+		$REDIRECT_URL_named = explode('?', $REDIRECT_URL);
+		$REDIRECT_URL_named = $REDIRECT_URL_named[0];
+
 
 		// set initial variables 
 		$localdir = dirname($SCRIPT_NAME);
-		$extensionArray = explode('.', $REDIRECT_URL);		
+		$extensionArray = explode('.', $REDIRECT_URL_named);		
 		$extension = false;
 		$publicDirReal = '';
 
@@ -45,8 +87,10 @@ class Directly{
 	
 		if(count($extensionArray)>1)			
 			$extension = end($extensionArray);
+
 		
-		$page = $REDIRECT_URL;
+		
+		$page = $REDIRECT_URL_named;
 		$page = preg_replace('#'.$localdir.'#i', '', $page, 1);		
 		
 		if($urlRoute != '/'){
@@ -71,7 +115,7 @@ class Directly{
 		}
 		
 		
-		
+			
 			
 		if($urlRoute==$page){
 			$page = $urlRoute.'/home';
@@ -116,12 +160,14 @@ class Directly{
 		$page_dir = str_replace('//', '/', $page_dir);
 		$page_error404 = $this->dir.'error/404/'.DIRECTORY_SEPARATOR;
 
-
+		
 
 		if($extension !== false){
 			$filename = getcwd().DIRECTORY_SEPARATOR.$page_app;
 			$filename = str_replace('//', '/', $filename);
 
+		
+		
 			$filenameArray = explode('/',dirname($filename));
 			$filenameArray = array_filter($filenameArray);
 			$filenameArray = array_values($filenameArray);
@@ -174,8 +220,11 @@ class Directly{
 				if($typeFile == 'text/php'){
 					include $filename;
 				}else{
-					$contentFile = file_get_contents($filename);				
-					echo $contentFile;
+
+					if($this->publicDir != ''){
+						$contentFile = file_get_contents($filename);				
+						echo $contentFile;
+					}
 				}
 			}else{
 				header("HTTP/1.0 404 Not Found [".$filename."]");
