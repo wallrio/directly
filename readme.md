@@ -23,7 +23,7 @@ require 'vendor/autoload.php';
 
 use directly\Directly as Directly;
 
-$directly = new Directly('app');
+$directly = new Directly('application');
 $directly->run('/');
 ```
 
@@ -68,7 +68,7 @@ RewriteRule ^(.+)$ index.php [L]
 ```
     /your-directory-project
         |
-        |--app/
+        |--application/
         |   |
         |   |--error
         |   |    |--404
@@ -104,9 +104,13 @@ RewriteRule ^(.+)$ index.php [L]
 
 ## Short tags
 
-    [inc:menu.php] =   includes no document the contents of the menu.php file located in the directory /app/inc
+    [inc:menu.php] =   includes no document the contents of the menu.php file located in the directory /application/inc
 
-    [inc-route:meta.php] = includes no document the contents of the menu.php file located in the directory /app/view/[CURRENT-PAGE]/meta.php
+    [inc-route:meta.php] = includes no document the contents of the menu.php file located in the directory /application/view/[CURRENT-PAGE]/meta.php
+
+    [global:FILE_NAME] = includes no document the contents of the menu.php file located in the directory /application/global/FILE_NAME.php
+
+    [domain:url] = replace to url of domain    
 
 ## License
 

@@ -5,7 +5,7 @@ namespace directly;
 class FileHandle{
 
 
-	public static function getType($filename) {
+    public static function getType($filename) {
 
         $mime_types = array(
 

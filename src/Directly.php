@@ -9,6 +9,7 @@ class Directly{
 
 	private $dir;
 	public $publicDir = '';
+	public $forceDomain = null,$page = null;
 
 	function __construct($appDir = 'app',$publicDir = null){
 		$this->dir = $appDir.DIRECTORY_SEPARATOR;
@@ -16,18 +17,25 @@ class Directly{
 			echo 'Not exist application [ '.$this->dir.' ]';
 			exit;	
 		}
-
 		$this->publicDir = $publicDir;
-
 		$this->changeHeader($appDir.'/'.$this->publicDir);
 		
 	}
 
-	public function getExtension($filename){
-		if(strpos($filename, '.')!== -1){
-			return 'html';
-		}
+	public function get(){
+		$returns = array(
+			'url'=>$this->url,
+			'dir'=>dirname(dirname(dirname(dirname(__DIR__)))).DIRECTORY_SEPARATOR.$this->dir,
+			'router'=>$this->page,
+			'page'=>$this->lastPage
+		);
+		return json_decode(json_encode($returns));
+	}
 
+	public function getExtension($filename){
+		if(strpos($filename, '.')!== -1)
+			return 'html';
+		
 		 $file_ext = explode('.',$filename);
 		 $file_ext = array_filter($file_ext);
 		 return end($file_ext);
@@ -43,27 +51,25 @@ class Directly{
 		$dirName = dirname($SCRIPT_NAME);
 		$fileName = basename($SCRIPT_NAME);
 		$filePath = str_replace($dirName, '', $REQUEST_URI);
-		
+	
 
 		$REQUEST_URI_NEW = $dirName.'/'.$publicDir.$filePath;
 		$SCRIPT_NAME_NEW = $dirName.'/'.$publicDir.'/'.$fileName;
 
-	
 		$_SERVER['REDIRECT_URL'] = $REQUEST_URI_NEW;
 		$_SERVER['REQUEST_URI'] = $REQUEST_URI_NEW;			
 		$_SERVER['SCRIPT_NAME'] = $SCRIPT_NAME_NEW;			
-		
-
+	
 
 
 	}
 
 	public function run($urlRoute = '/'){
 
+		// get request data	
+		$SERVER_PROTOCOL = $_SERVER['SERVER_PROTOCOL'];	
+		$protocol = (strpos($SERVER_PROTOCOL, 'HTTP/') !==1)?'http':'unknown';
 
-		
-		// get request data
-		$REQUEST_SCHEME = $_SERVER['REQUEST_SCHEME'];	
 		$HTTP_HOST = $_SERVER['HTTP_HOST'];	
 		$SCRIPT_NAME = $_SERVER['SCRIPT_NAME'];	
 		$SERVER_PROTOCOL = isset($SERVER_PROTOCOL['REDIRECT_URL'])?($SERVER_PROTOCOL['REDIRECT_URL']):null;
@@ -81,10 +87,12 @@ class Directly{
 		$extension = false;
 		$publicDirReal = '';
 
-		$this->domain = $REQUEST_SCHEME . '://' . str_replace('//', '/', $HTTP_HOST.'/'.$localdir).'/';
+		$this->domain = $protocol . '://' . str_replace('//', '/', $HTTP_HOST.'/'.$localdir).'/';
+		$this->domain = str_ireplace($this->dir.$this->publicDir.'/', '', $this->domain);
 
-		
-	
+		if( $this->forceDomain != null )
+		$this->domain = $this->forceDomain;
+
 		if(count($extensionArray)>1)			
 			$extension = end($extensionArray);
 
@@ -115,8 +123,6 @@ class Directly{
 		}
 		
 		
-			
-			
 		if($urlRoute==$page){
 			$page = $urlRoute.'/home';
 		}
@@ -132,13 +138,8 @@ class Directly{
 		$urlRouteArray = array_values($urlRouteArray);
 		
 		
-		
-
 		$routeStatus = true;
 		foreach ($urlRouteArray as $key => $value) {	
-
-		
-
 			if($value === $pageArray[$key]){
 				unset($pageNewArray[$key]);
 			}else{
@@ -160,7 +161,21 @@ class Directly{
 		$page_dir = str_replace('//', '/', $page_dir);
 		$page_error404 = $this->dir.'error/404/'.DIRECTORY_SEPARATOR;
 
-		
+		$this->url = $this->domain;
+		$this->page = $page;
+		$pageArray = explode('/', $page);		
+		$this->lastPage = end($pageArray);
+		// define parameters on send to front-end
+		$directlyParameters = array('domain'=>$this->domain,'page'=>$page,'applicationDir'=>$this->dir,'publicDir'=>$this->publicDir);
+		setcookie('directly',json_encode($directlyParameters));
+
+
+		// set define constant
+		define('dy_url',$this->url);
+		define('dy_dir',dirname(dirname(dirname(dirname(__DIR__)))).DIRECTORY_SEPARATOR.$this->dir);
+		define('dy_router',$this->page);
+		define('dy_page',$this->lastPage);
+
 
 		if($extension !== false){
 			$filename = getcwd().DIRECTORY_SEPARATOR.$page_app;
@@ -189,6 +204,8 @@ class Directly{
 				
 			}
 
+			
+
 			// adjust assets to error page -------------------------
 			$pageArray = explode('/', $page);
 			$pageArray = array_reverse($pageArray);
@@ -212,15 +229,14 @@ class Directly{
 			}
 
 
-
-
 			if(file_exists($filename)){		
+
 				$typeFile = FileHandle::getType($filename);					
-				header('Content-Type: '.$typeFile.'; charset=UTF-8');				
+
+				header('Content-Type: '.$typeFile.'; charset=UTF-8');	
 				if($typeFile == 'text/php'){
 					include $filename;
 				}else{
-
 					if($this->publicDir != ''){
 						$contentFile = file_get_contents($filename);				
 						echo $contentFile;
@@ -234,7 +250,26 @@ class Directly{
 
 			
 			
+		$helpCreate = false;
+		$htmlHelp = '';
+		if(!file_exists($global_dir.'header.php')){
+			$htmlHelp .= 'Need to create the file/directory <strong>['.$global_dir.'header.php]</strong>'."<br>";			
+			$helpCreate = true;
+		}if(!file_exists($global_dir.'footer.php')){
+			$htmlHelp .= 'Need to create the file/directory <strong>['.$global_dir.'footer.php]</strong>'."<br>";			
+			$helpCreate = true;
+		}if(!file_exists($page_error404.'view.php')){
+			$htmlHelp .= 'Need to create the file/directory <strong>['.$page_error404.'view.php]</strong>'."<br>";			
+			$helpCreate = true;
+		}if(!file_exists($this->dir.'view')){
+			$htmlHelp .= 'Need to create the file/directory <strong>['.$this->dir.'view'.'/CURRENT-PAGE]</strong>'."<br>";			
+			$helpCreate = true;
+		}
 
+		if($helpCreate == true){
+			die($htmlHelp);
+		}
+		
 		// get content of buffer
 		
 		ob_start();
@@ -250,9 +285,10 @@ class Directly{
 		$content = ob_get_contents();
 		ob_end_clean();
 
+		
 
 		// filter with shorttag
-		$content = Filter::includes($content,$this->dir,$this->domain,$page);
+		$content = Filter::includes($content,$this->dir,$this->publicDir,$this->domain,$page);
 		
 		// show de content
 		$this->show($content);
