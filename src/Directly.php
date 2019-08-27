@@ -7,14 +7,18 @@ use \directly\Filter as Filter;
 
 class Directly{
 
-	private $dir;
-	public $publicDir = '';
-	public $forceDomain = null,$page = null;
+	
+	public  $forceDomain = null,
+			$publicDir = '';
+
+	public static $page,
+				  $dir,
+				  $url;
 
 	function __construct($appDir = 'app',$publicDir = null){
-		$this->dir = $appDir.DIRECTORY_SEPARATOR;
-		if(!file_exists($this->dir)){
-			echo 'Not exist application [ '.$this->dir.' ]';
+		self::$dir = $appDir.DIRECTORY_SEPARATOR;
+		if(!file_exists(self::$dir)){
+			echo 'Not exist application [ '.self::$dir.' ]';
 			exit;	
 		}
 		$this->publicDir = $publicDir;
@@ -22,10 +26,48 @@ class Directly{
 		
 	}
 
+	public static function getMeta($url){		
+
+		$path = self::$dir.'view'.DIRECTORY_SEPARATOR.$url.DIRECTORY_SEPARATOR;
+		$path = str_replace(DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, $path);
+		
+		$filename = $path.'meta.php';
+		if(file_exists($filename)){			
+			$content = file_get_contents($filename);
+			
+			preg_match_all( "/<meta[^>]+(http\-equiv|name)=\"([^\"]*)\"[^>]" . "+content=\"([^\"]*)\"[^>]*>/i", $content, $split_content,PREG_SET_ORDER);; 
+
+			$arrayGeneral = array();
+			foreach ($split_content as $key => $value) {
+					$name = $value[2];
+					$val = $value[3];
+					$arrayInit[$name] = $val;
+				
+			}
+
+			@preg_match( "/<title>(.*)<\/title>/si", $content, $match );
+
+			$title = isset($match[1])?$match[1]:null;
+
+			$arrayGeneral['title'] = $title;
+
+			if(substr($url, strlen($url)-1) === '/')
+				$url = substr($url, 0, strlen($url)-1);
+
+			$arrayGeneral['url'] = $url;
+			
+			$lasturl = explode('/', $url);
+			$arrayGeneral['lasturl'] = end($lasturl);
+			
+			return $arrayGeneral;
+
+		}
+	}
+
 	public function get(){
 		$returns = array(
-			'url'=>$this->url,
-			'dir'=>dirname(dirname(dirname(dirname(__DIR__)))).DIRECTORY_SEPARATOR.$this->dir,
+			'url'=>self::$url,
+			'dir'=>dirname(dirname(dirname(dirname(__DIR__)))).DIRECTORY_SEPARATOR.self::$dir,
 			'router'=>$this->page,
 			'page'=>$this->lastPage
 		);
@@ -88,7 +130,7 @@ class Directly{
 		$publicDirReal = '';
 
 		$this->domain = $protocol . '://' . str_replace('//', '/', $HTTP_HOST.'/'.$localdir).'/';
-		$this->domain = str_ireplace($this->dir.$this->publicDir.'/', '', $this->domain);
+		$this->domain = str_ireplace(self::$dir.$this->publicDir.'/', '', $this->domain);
 
 		if( $this->forceDomain != null )
 		$this->domain = $this->forceDomain;
@@ -155,25 +197,25 @@ class Directly{
 
 
 		// set paths
-		$global_dir = $this->dir.'global'.DIRECTORY_SEPARATOR;
-		$page_app = $this->dir.$this->publicDir.DIRECTORY_SEPARATOR.$page;
-		$page_dir = $this->dir.'view'.DIRECTORY_SEPARATOR.$page.DIRECTORY_SEPARATOR;
+		$global_dir = self::$dir.'global'.DIRECTORY_SEPARATOR;
+		$page_app = self::$dir.$this->publicDir.DIRECTORY_SEPARATOR.$page;
+		$page_dir = self::$dir.'view'.DIRECTORY_SEPARATOR.$page.DIRECTORY_SEPARATOR;
 		$page_dir = str_replace('//', '/', $page_dir);
-		$page_error404 = $this->dir.'error/404/'.DIRECTORY_SEPARATOR;
+		$page_error404 = self::$dir.'error/404/'.DIRECTORY_SEPARATOR;
 
-		$this->url = $this->domain;
-		$this->page = $page;
+		self::$url = $this->domain;
+		self::$page = $page;
 		$pageArray = explode('/', $page);		
 		$this->lastPage = end($pageArray);
 		// define parameters on send to front-end
-		$directlyParameters = array('domain'=>$this->domain,'page'=>$page,'applicationDir'=>$this->dir,'publicDir'=>$this->publicDir);
+		$directlyParameters = array('domain'=>$this->domain,'page'=>$page,'applicationDir'=>self::$dir,'publicDir'=>$this->publicDir);
 		setcookie('directly',json_encode($directlyParameters));
 
 
 		// set define constant
-		define('dy_url',$this->url);
-		define('dy_dir',dirname(dirname(dirname(dirname(__DIR__)))).DIRECTORY_SEPARATOR.$this->dir);
-		define('dy_router',$this->page);
+		define('dy_url',self::$url);
+		define('dy_dir',dirname(dirname(dirname(dirname(__DIR__)))).DIRECTORY_SEPARATOR.self::$dir);
+		define('dy_router',self::$page);
 		define('dy_page',$this->lastPage);
 
 
@@ -197,7 +239,7 @@ class Directly{
 			foreach ($newArray as $key => $value) {
 				if(file_exists('/'.$value)){					
 					
-					$page_assets = $this->dir.$this->publicDir.DIRECTORY_SEPARATOR;
+					$page_assets = self::$dir.$this->publicDir.DIRECTORY_SEPARATOR;
 					$filename = getcwd().DIRECTORY_SEPARATOR.$page_assets;
 					break;
 				}
@@ -261,8 +303,8 @@ class Directly{
 		}if(!file_exists($page_error404.'view.php')){
 			$htmlHelp .= 'Need to create the file/directory <strong>['.$page_error404.'view.php]</strong>'."<br>";			
 			$helpCreate = true;
-		}if(!file_exists($this->dir.'view')){
-			$htmlHelp .= 'Need to create the file/directory <strong>['.$this->dir.'view'.'/CURRENT-PAGE]</strong>'."<br>";			
+		}if(!file_exists(self::$dir.'view')){
+			$htmlHelp .= 'Need to create the file/directory <strong>['.self::$dir.'view'.'/CURRENT-PAGE]</strong>'."<br>";			
 			$helpCreate = true;
 		}
 
@@ -288,7 +330,7 @@ class Directly{
 		
 
 		// filter with shorttag
-		$content = Filter::includes($content,$this->dir,$this->publicDir,$this->domain,$page);
+		$content = Filter::includes($content,self::$dir,$this->publicDir,$this->domain,$page);
 		
 		// show de content
 		$this->show($content);
